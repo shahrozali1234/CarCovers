@@ -348,6 +348,45 @@
     </aside>
 
     <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== CAR COVER IMAGE MODAL ===== -->
+    <div id="coverImageModal" class="cover-modal-overlay" onclick="closeCoverModal(event)">
+        <div class="cover-modal-box">
+            <button class="cover-modal-close" onclick="closeCoverModal(null)">✕</button>
+
+            <div class="cover-modal-header">
+                <div>
+                    <span id="coverModalBrand" class="car-brand-pill"></span>
+                    <h2 id="coverModalTitle" class="cover-modal-title"></h2>
+                    <p id="coverModalSubtitle" class="cover-modal-subtitle"></p>
+                </div>
+                <span id="coverModalBodyBadge" class="car-body-badge"></span>
+            </div>
+
+            <!-- Image Gallery -->
+            <div class="cover-gallery-wrap">
+                <button class="gallery-arrow gallery-prev" onclick="coverGalleryPrev()">&#8249;</button>
+                <div class="cover-gallery-stage">
+                    <img id="coverGalleryImg" src="" alt="Car Cover" class="cover-gallery-img" />
+                    <div class="cover-gallery-label" id="coverGalleryLabel"></div>
+                </div>
+                <button class="gallery-arrow gallery-next" onclick="coverGalleryNext()">&#8250;</button>
+            </div>
+
+            <!-- Thumbnail dots -->
+            <div class="cover-gallery-dots" id="coverGalleryDots"></div>
+
+            <!-- Specs row -->
+            <div class="cover-modal-specs" id="coverModalSpecs"></div>
+
+            <!-- CTA Buttons -->
+            <div class="cover-modal-cta">
+                <button class="btn btn-whatsapp" id="coverModalWaBtn" onclick="">💬 Order via WhatsApp</button>
+                <a id="coverModalShopBtn" href="shop.html" class="btn btn-primary">🛒 Shop All Covers</a>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

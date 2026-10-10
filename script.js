@@ -417,9 +417,9 @@ function renderHomeProducts() {
     grid.innerHTML = featured.map(p => createProductCardHTML(p)).join('');
   }
 
-  // Render Pakistan Car Directory if present
+  // Render Pakistan Car Directory if present — show empty/prompt state by default
   if (document.getElementById('carDirectoryGrid')) {
-    renderPakistanCarDirectory('all', '');
+    showCarDirectoryPrompt();
   }
 }
 
@@ -520,6 +520,9 @@ function createProductCardHTML(p) {
           <button class="btn btn-whatsapp" style="padding:10px 14px;" onclick="orderViaWhatsApp(${p.id})" title="Order via WhatsApp">
             💬
           </button>
+          <button class="btn btn-outline view-cover-btn" style="padding:8px 12px; background:#1e2131; color:#fff; border:none; margin-left:8px;" onclick="event.stopPropagation(); openProductCoverModal(${JSON.stringify({ ...p, make: p.name.split(' ')[0] || 'AutoShield })})">
+            🖼️ View Images
+          </button>
         </div>
       </div>
     </article>
@@ -617,7 +620,9 @@ function searchFitCover() {
 function filterCarsByBrand(brand) {
   currentCarBrandFilter = brand;
   document.querySelectorAll('.car-chip').forEach(chip => {
-    chip.classList.toggle('active', chip.textContent.trim().toLowerCase() === brand.toLowerCase() || (brand === 'all' && chip.textContent.includes('All')));
+    const isAll = brand === 'all';
+    const chipLabel = chip.textContent.trim().toLowerCase();
+    chip.classList.toggle('active', chipLabel === brand.toLowerCase() || (isAll && chip.textContent.includes('All')));
   });
   const searchInput = document.getElementById('carDirectorySearch');
   renderPakistanCarDirectory(currentCarBrandFilter, searchInput ? searchInput.value : '');
@@ -627,11 +632,30 @@ function handleCarSearch(query) {
   renderPakistanCarDirectory(currentCarBrandFilter, query);
 }
 
+function showCarDirectoryPrompt() {
+  const container = document.getElementById('carDirectoryGrid');
+  if (!container) return;
+  container.innerHTML = `
+    <div style="grid-column: 1 / -1; text-align: center; padding: 64px 24px; color: var(--text-muted);">
+      <div style="font-size: 4rem; margin-bottom: 16px; animation: pulse 2s infinite;">🔍</div>
+      <h3 style="font-size: 1.4rem; color: var(--text-light); margin-bottom: 10px;">Search for Your Car</h3>
+      <p style="max-width: 420px; margin: 0 auto; line-height: 1.7;">Type your car name above (e.g. <strong>Civic</strong>, <strong>Corolla</strong>, <strong>Alto</strong>) or select a brand below to see guaranteed custom-fit cover details.</p>
+    </div>
+  `;
+}
+
 function renderPakistanCarDirectory(brand = 'all', query = '') {
   const container = document.getElementById('carDirectoryGrid');
   if (!container) return;
 
   const q = (query || '').toLowerCase().trim();
+
+  // Show prompt when nothing is active
+  if (brand === 'all' && !q) {
+    showCarDirectoryPrompt();
+    return;
+  }
+
   let list = PAKISTAN_CARS_DATABASE;
 
   if (brand && brand !== 'all') {
@@ -647,7 +671,7 @@ function renderPakistanCarDirectory(brand = 'all', query = '') {
   }
 
   if (q) {
-    list = list.filter(c => 
+    list = list.filter(c =>
       c.make.toLowerCase().includes(q) ||
       c.model.toLowerCase().includes(q) ||
       c.body.toLowerCase().includes(q) ||
@@ -689,12 +713,12 @@ function renderPakistanCarDirectory(brand = 'all', query = '') {
       </p>
 
       <div class="car-actions-row">
-        <button type="button" class="btn btn-whatsapp" onclick="orderCustomCarCoverViaWhatsApp('${car.make.replace(/'/g, "\\'")}', '${car.model.replace(/'/g, "\\'")}', '${car.size.replace(/'/g, "\\'")}', '${car.body.replace(/'/g, "\\'")}')">
+        <button type="button" class="btn btn-whatsapp" onclick="orderCustomCarCoverViaWhatsApp('${car.make.replace(/'/g, "\\'")}',' ${car.model.replace(/'/g, "\\'")}',' ${car.size.replace(/'/g, "\\'")}',' ${car.body.replace(/'/g, "\\'")}')">
           💬 WhatsApp Fit
         </button>
-        <a href="product-detail.html?id=${car.productId || 1}" class="btn btn-primary">
-          🛒 View Cover
-        </a>
+        <button type="button" class="btn btn-primary" onclick='openCoverModal(${JSON.stringify(car)})'>
+          🖼️ View Cover
+        </button>
       </div>
     </div>
   `).join('');
@@ -714,6 +738,173 @@ function orderCustomCarCoverViaWhatsApp(make, model, size, body) {
   window.open(url, '_blank');
 }
 
+// ===== COVER IMAGE MODAL =====
+const COVER_IMAGES = {
+  Hatchback: [
+    { src: 'images/cover_sedan_black.png',   label: 'Custom-Fit Hatchback Cover — Black Armour' },
+    { src: 'images/product_silver_cover.png', label: 'Silver Reflective Cover — UV Protection' },
+    { src: 'images/hero_car_cover.png',       label: 'AutoShield Premium — Windproof Design' }
+  ],
+  Sedan: [
+    { src: 'images/hero_car_cover.png',       label: 'AutoShield Sedan Cover — Premium Branded' },
+    { src: 'images/cover_sedan_black.png',    label: 'Black Armour Series — Sedan Fit' },
+    { src: 'images/product_silver_cover.png', label: 'Silver Heat Deflector — Sedan XL' }
+  ],
+  SUV: [
+    { src: 'images/cat_suv_cover.png',        label: 'Heavy-Duty SUV / 4x4 Cover — Ultra Guard' },
+    { src: 'images/cover_sedan_silver.png',   label: 'Silver Composite — Crossover Fit' },
+    { src: 'images/hero_car_cover.png',       label: 'AutoShield SUV — All-Weather Protection' }
+  ],
+  Van: [
+    { src: 'images/cat_suv_cover.png',        label: 'Commercial Van Cover — Full-Roof Protection' },
+    { src: 'images/product_silver_cover.png', label: 'Silver Reflective — Van / MPV' }
+  ],
+  Pickup: [
+    { src: 'images/cat_suv_cover.png',        label: 'Pickup Truck Cover — Extended Deck' },
+    { src: 'images/cover_sedan_black.png',    label: 'Heavy-Duty Black — Pickup Protection' }
+  ],
+  Commercial: [
+    { src: 'images/cat_suv_cover.png',        label: 'Commercial Vehicle Cover' },
+    { src: 'images/product_silver_cover.png', label: 'Heavy Duty Shield — Commercial Grade' }
+  ],
+  default: [
+    { src: 'images/product_silver_cover.png', label: 'AutoShield Custom-Fit Cover' },
+    { src: 'images/hero_car_cover.png',       label: 'Premium Protection Cover' }
+  ]
+};
+
+// Map product body style to image set body type
+function getBodyTypeFromProduct(product) {
+  const bodyLower = (product.bodyStyle || '').toLowerCase();
+  if (bodyLower.includes('hatch') || bodyLower.includes('back')) return 'Hatchback';
+  if (bodyLower.includes('suv') || bodyLower.includes('4x4') || bodyLower.includes('pickup')) return 'SUV';
+  if (bodyLower.includes('van') || bodyLower.includes('mpv')) return 'Van';
+  if (bodyLower.includes('pickup') || bodyLower.includes('truck')) return 'Pickup';
+  return 'Sedan'; // default
+}
+
+// Open cover modal for a product card
+function openProductCoverModal(product) {
+  const modal = document.getElementById('coverImageModal');
+  if (!modal) return;
+
+  // Populate header with product info
+  document.getElementById('coverModalBrand').textContent = product.name.split(' ')[0] || 'AutoShield';
+  document.getElementById('coverModalTitle').textContent = product.name;
+  document.getElementById('coverModalSubtitle').textContent = product.bodyStyle || 'Cover';
+  document.getElementById('coverModalBodyBadge').textContent = product.bodyStyle || 'Sedan';
+
+  // Pick image set based on product body style
+  const bodyType = getBodyTypeFromProduct(product);
+  _coverGallery = COVER_IMAGES[bodyType] || COVER_IMAGES.default;
+  _coverGalleryIdx = 0;
+  _renderCoverGallery(product);
+
+  // Specs - show product specs
+  const specsHtml = `
+    <div class="cover-spec-chip">📐 ${product.sizesAvailable ? product.sizesAvailable[0] : 'One Size'}</div>
+    <div class="cover-spec-chip">🛡️ ${product.waterproofRating || 'Waterproof'}</div>
+    <div class="cover-spec-chip">☀️ ${product.uvProtection || 'UV Protection'}</div>
+    <div class="cover-spec-chip">💧 Waterproof</div>
+  `;
+  document.getElementById('coverModalSpecs').innerHTML = specsHtml;
+
+  // WhatsApp button - order this product via WhatsApp
+  const waBtn = document.getElementById('coverModalWaBtn');
+  waBtn.onclick = () => {
+    const msg = `🛡️ *AUTOSHIELD ORDER INQUIRY*\n`;
+    msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `🚗 *Product:* ${product.name}\n`;
+    msg += `💰 *Price:* Rs. ${product.price}\n`;
+    msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `Hello! I'm interested in the ${product.name}. Please confirm availability, price and cash on delivery.\n`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+  };
+
+  // Shop button - go back to shop
+  document.getElementById('coverModalShopBtn').href = `shop.html`;
+
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function _renderCoverGallery(product) {
+  const img   = document.getElementById('coverGalleryImg');
+  const label = document.getElementById('coverGalleryLabel');
+  const dots  = document.getElementById('coverGalleryDots');
+
+  const slide = _coverGallery[_coverGalleryIdx];
+  img.src     = slide.src;
+  img.alt     = `${product.make || ''} ${product.name} Car Cover`;
+  label.textContent = slide.label;
+
+  // dots
+  dots.innerHTML = _coverGallery.map((_, i) =>
+    `<span class="gallery-dot ${i === _coverGalleryIdx ? 'active' : ''}" onclick="_jumpCoverGallery(${i})"></span>`
+  ).join('');
+}
+
+function _jumpCoverGallery(idx) {
+  _coverGalleryIdx = idx;
+  _renderCoverGallery(null);
+}
+
+function coverGalleryNext() {
+  _coverGalleryIdx = (_coverGalleryIdx + 1) % _coverGallery.length;
+  _renderCoverGallery(null);
+}
+
+function coverGalleryPrev() {
+  _coverGalleryIdx = (_coverGalleryIdx - 1 + _coverGallery.length) % _coverGallery.length;
+  _renderCoverGallery(null);
+}
+
+function closeCoverModal(e) {
+  if (e && e.target !== document.getElementById('coverImageModal')) return;
+  const modal = document.getElementById('coverImageModal');
+  if (modal) modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function _renderCoverGallery(car) {
+  const img   = document.getElementById('coverGalleryImg');
+  const label = document.getElementById('coverGalleryLabel');
+  const dots  = document.getElementById('coverGalleryDots');
+
+  const slide = _coverGallery[_coverGalleryIdx];
+  img.src     = slide.src;
+  img.alt     = `${car ? car.make + ' ' + car.model : ''} Car Cover`;
+  label.textContent = slide.label;
+
+  // dots
+  dots.innerHTML = _coverGallery.map((_, i) =>
+    `<span class="gallery-dot ${i === _coverGalleryIdx ? 'active' : ''}" onclick="_jumpCoverGallery(${i})"></span>`
+  ).join('');
+}
+
+function _jumpCoverGallery(idx) {
+  _coverGalleryIdx = idx;
+  _renderCoverGallery(null);
+}
+
+function coverGalleryNext() {
+  _coverGalleryIdx = (_coverGalleryIdx + 1) % _coverGallery.length;
+  _renderCoverGallery(null);
+}
+
+function coverGalleryPrev() {
+  _coverGalleryIdx = (_coverGalleryIdx - 1 + _coverGallery.length) % _coverGallery.length;
+  _renderCoverGallery(null);
+}
+
+function closeCoverModal(e) {
+  if (e && e.target !== document.getElementById('coverImageModal')) return;
+  const modal = document.getElementById('coverImageModal');
+  if (modal) modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
 function handleCarSelectChange(selectEl) {
   const val = selectEl.value;
   const notesEl = document.getElementById('custNotes');
@@ -728,7 +919,7 @@ function handleCarSelectChange(selectEl) {
 }
 
 function initCategoriesPage() {
-  renderPakistanCarDirectory('all', '');
+  showCarDirectoryPrompt();
 }
 
 

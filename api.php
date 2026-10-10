@@ -41,16 +41,64 @@ class Product {
     }
 }
 
-// Initialize product model
+// Order class
+class Order {
+    public function create($orderNum, $custName, $phone, $city, $address, $payment, $total, $itemsJson, $notes) {
+        global $pdo;
+        $stmt = $pdo->prepare("INSERT INTO orders (order_number, customer_name, phone, city, address, payment_method, total_amount, items_json, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$orderNum, $custName, $phone, $city, $address, $payment, $total, $itemsJson, $notes]);
+        return $pdo->lastInsertId();
+    }
+    
+    public function getAll() {
+        global $pdo;
+        $stmt = $pdo->query("SELECT * FROM orders ORDER BY createdAt DESC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+
+// Initialize models
 $product = new Product();
+$orderModel = new Order();
 
 // Handle API requests
 $uri = explode('/', trim($_SERVER["REQUEST_URI"], '/'));
 $method = $_SERVER["REQUEST_METHOD"];
-$uri = array_filter($uri, function($x) { return !empty($x); });
+$uri = array_values(array_filter($uri, function($x) { return !empty($x); }));
+
+// Determine route segments
+$isOrdersRoute = (isset($uri[0]) && $uri[0] === 'api' && isset($uri[1]) && $uri[1] === 'orders') || (isset($uri[0]) && $uri[0] === 'orders');
+
+if ($isOrdersRoute) {
+    if ($method === 'POST') {
+        $data = json_decode(file_get_contents("php://input"), true);
+        if ($data) {
+            $orderNum = $data["order_number"] ?? ('AS-' . rand(100000, 999999));
+            $itemsJson = is_array($data["items"] ?? null) ? json_encode($data["items"]) : ($data["items_json"] ?? "[]");
+            $newId = $orderModel->create(
+                $orderNum,
+                $data["customer_name"] ?? "",
+                $data["phone"] ?? "",
+                $data["city"] ?? "",
+                $data["address"] ?? "",
+                $data["payment_method"] ?? "Cash on Delivery",
+                $data["total_amount"] ?? 0,
+                $itemsJson,
+                $data["notes"] ?? ""
+            );
+            echo json_encode(["status" => "success", "orderId" => $newId, "orderNumber" => $orderNum]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "No order data provided"]);
+        }
+    } elseif ($method === 'GET') {
+        $orders = $orderModel->getAll();
+        echo json_encode(["status" => "success", "orders" => $orders, "count" => count($orders)]);
+    }
+    exit;
+}
 
 // Routes: /api/products (GET, POST) and /api/products/{id} (GET, PUT, DELETE)
-if ($uri[0] === 'api' && $uri[1] === 'products') {
+if (isset($uri[0]) && $uri[0] === 'api' && isset($uri[1]) && $uri[1] === 'products') {
     $id = isset($uri[2]) ? (int)$uri[2] : null;
     
     if ($method === 'GET') {
@@ -94,5 +142,5 @@ if ($uri[0] === 'api' && $uri[1] === 'products') {
     }
 } else {
     // Default: show info
-    echo json_encode(["status" => "success", "message" => "API running", "endpoints" => ["/api/products"]]);
+    echo json_encode(["status" => "success", "message" => "API running", "endpoints" => ["/api/products", "/api/orders"]]);
 }

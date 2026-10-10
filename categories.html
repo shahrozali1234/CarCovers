@@ -13,7 +13,7 @@
         <div class="topbar-content">
             <span class="topbar-badge">CATEGORIES DIRECTORY</span>
             <span>⚡ FREE DELIVERY ON SELECTED ORDERS OVER RS. 5,000 • CASH ON DELIVERY NATIONWIDE</span>
-            <span>📞 WHATSAPP ORDER: +92 300 1234567</span>
+            <span>📞 WHATSAPP ORDER: +92 328 5154975</span>
         </div>
     </div>
 
@@ -111,6 +111,41 @@
         </div>
     </section>
 
+    <!-- Pakistan Vehicle Fitment Directory Section -->
+    <section class="car-directory-section" id="pakistan-cars">
+        <div class="container">
+            <div class="section-head" style="text-align:center; max-width:780px; margin:0 auto 36px;">
+                <div class="eyebrow">🇵🇰 50+ PAKISTANI CARS COMPATIBILITY MATRIX</div>
+                <h2 style="font-size:2.4rem; margin-bottom:12px;">Pakistan Vehicle Compatibility Guide</h2>
+                <p>Lookup any Pakistani vehicle to view guaranteed custom cover size, body dimensions, and instant WhatsApp ordering.</p>
+            </div>
+
+            <div class="car-search-bar-wrap">
+                <div class="car-search-input-box">
+                    <span class="car-search-icon">🔍</span>
+                    <input type="text" id="carDirectorySearch" placeholder="Search your car (e.g. Alto, Mehran, Civic, Corolla, Sportage, Alsvin, Fortuner, Mira)..." oninput="handleCarSearch(this.value)">
+                </div>
+
+                <div class="car-filter-chips" id="carFilterChips">
+                    <button class="car-chip active" onclick="filterCarsByBrand('all')">All Cars (50+)</button>
+                    <button class="car-chip" onclick="filterCarsByBrand('Suzuki')">Suzuki</button>
+                    <button class="car-chip" onclick="filterCarsByBrand('Toyota')">Toyota</button>
+                    <button class="car-chip" onclick="filterCarsByBrand('Honda')">Honda</button>
+                    <button class="car-chip" onclick="filterCarsByBrand('Hyundai')">Hyundai</button>
+                    <button class="car-chip" onclick="filterCarsByBrand('Kia')">Kia</button>
+                    <button class="car-chip" onclick="filterCarsByBrand('Changan')">Changan</button>
+                    <button class="car-chip" onclick="filterCarsByBrand('MG')">MG & Haval</button>
+                    <button class="car-chip" onclick="filterCarsByBrand('Japanese Kei')">Kei Cars (Mira / Dayz)</button>
+                    <button class="car-chip" onclick="filterCarsByBrand('Luxury')">German Luxury (Audi/BMW/Benz)</button>
+                </div>
+            </div>
+
+            <div class="car-directory-grid" id="carDirectoryGrid">
+                <!-- Dynamically rendered by script.js -->
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container footer-grid">
@@ -136,7 +171,7 @@
             </div>
             <div class="footer-col">
                 <h4>Contact</h4>
-                <p>📍 Gulberg III, Lahore, Pakistan<br>📞 +92 300 1234567</p>
+                <p>📍 Gulberg III, Lahore, Pakistan<br>📞 +92 328 5154975</p>
             </div>
         </div>
     </footer>

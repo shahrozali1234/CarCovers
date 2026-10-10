@@ -13,7 +13,7 @@
         <div class="topbar-content">
             <span class="topbar-badge">SECURE CHECKOUT</span>
             <span>⚡ FREE DELIVERY ON SELECTED ORDERS OVER RS. 5,000 • CASH ON DELIVERY NATIONWIDE</span>
-            <span>📞 WHATSAPP ORDER: +92 300 1234567</span>
+            <span>📞 WHATSAPP ORDER: +92 328 5154975</span>
         </div>
     </div>
 
@@ -85,12 +85,17 @@
                         <textarea id="custAddress" required rows="3" placeholder="House #, Street #, Sector/Area..." style="width:100%; padding:12px; background:var(--dark-bg); color:#fff; border:1px solid var(--border); border-radius:var(--radius-md);"></textarea>
                     </div>
 
-                    <div style="margin-bottom:24px;">
+                    <div style="margin-bottom:16px;">
                         <label style="display:block; font-weight:700; margin-bottom:6px; font-size:0.85rem;">Payment Method</label>
-                        <select style="width:100%; padding:12px; background:var(--dark-bg); color:#fff; border:1px solid var(--border); border-radius:var(--radius-md);">
-                            <option>Cash on Delivery (COD)</option>
-                            <option>Bank Transfer / JazzCash / EasyPaisa</option>
+                        <select id="custPayment" style="width:100%; padding:12px; background:var(--dark-bg); color:#fff; border:1px solid var(--border); border-radius:var(--radius-md);">
+                            <option value="Cash on Delivery (COD)">Cash on Delivery (COD)</option>
+                            <option value="Bank Transfer / JazzCash / EasyPaisa">Bank Transfer / JazzCash / EasyPaisa</option>
                         </select>
+                    </div>
+
+                    <div style="margin-bottom:24px;">
+                        <label style="display:block; font-weight:700; margin-bottom:6px; font-size:0.85rem;">Car Model / Special Notes (Optional)</label>
+                        <input type="text" id="custNotes" placeholder="e.g. Honda Civic 2022, call before delivery" style="width:100%; padding:12px; background:var(--dark-bg); color:#fff; border:1px solid var(--border); border-radius:var(--radius-md);">
                     </div>
 
                     <div style="border-top:1px solid var(--border); padding-top:16px; margin-bottom:20px;">
@@ -107,6 +112,41 @@
 
         </div>
     </section>
+
+    <!-- Order Confirmation Modal -->
+    <div class="modal-backdrop" id="orderConfirmModal">
+        <div class="order-modal">
+            <div class="order-modal-header">
+                <div class="order-success-icon">✓</div>
+                <h2 style="font-size:1.6rem; margin-bottom:4px;">Order Confirmed! 🎉</h2>
+                <p style="color:var(--text-secondary); font-size:0.9rem;">Thank you! Your AutoShield order has been received.</p>
+                <div class="order-id-badge" id="modalOrderNumber">#AS-000000</div>
+            </div>
+
+            <div class="order-receipt-card" id="modalReceiptContent">
+                <!-- Dynamically populated by script.js -->
+            </div>
+
+            <div class="order-actions-stack">
+                <a href="#" id="modalStoreWaBtn" target="_blank" class="btn btn-whatsapp btn-full" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    💬 Open WhatsApp to Send Order to Store
+                </a>
+                <a href="#" id="modalCustomerWaBtn" target="_blank" class="btn btn-secondary-action btn-full" style="text-decoration:none;">
+                    📲 Send Confirmation to Customer WhatsApp
+                </a>
+                <button type="button" class="btn-secondary-action btn-full" onclick="copyOrderSummary()">
+                    📋 Copy Order Details to Clipboard
+                </button>
+                <button type="button" class="btn btn-outline btn-full" onclick="closeOrderModal()" style="margin-top:4px;">
+                    Continue Shopping
+                </button>
+            </div>
+
+            <p class="whatsapp-notice">
+                🔒 An automated text summary has been generated for WhatsApp. You can review and send it anytime.
+            </p>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -132,7 +172,7 @@
             </div>
             <div class="footer-col">
                 <h4>Contact</h4>
-                <p>📍 Gulberg III, Lahore, Pakistan<br>📞 +92 300 1234567</p>
+                <p>📍 Gulberg III, Lahore, Pakistan<br>📞 +92 328 5154975</p>
             </div>
         </div>
     </footer>

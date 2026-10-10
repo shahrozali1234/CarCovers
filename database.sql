@@ -53,3 +53,23 @@ UPDATE products SET price = 7000 WHERE id = 1;
 
 -- Delete product
 DELETE FROM products WHERE id = 99;
+
+-- ===== ORDERS TABLE & LOGS =====
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_number VARCHAR(50) NOT NULL UNIQUE,
+    customer_name VARCHAR(255) NOT NULL,
+    phone VARCHAR(50) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    address TEXT NOT NULL,
+    payment_method VARCHAR(100) DEFAULT 'Cash on Delivery (COD)',
+    total_amount DECIMAL(10, 2) NOT NULL,
+    items_json LONGTEXT NOT NULL,
+    notes TEXT,
+    status VARCHAR(50) DEFAULT 'Confirmed',
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_order_num (order_number),
+    INDEX idx_order_phone (phone),
+    INDEX idx_order_createdAt (createdAt)
+);
